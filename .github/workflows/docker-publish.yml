@@ -27,12 +27,12 @@ jobs:
 
       - name: Echo Docker Image Details
         run: |
-          echo "Image Name: "joshdleexxx/testing:1234"
+          echo "Image Name: joshdleexxx/testing:1234"
           echo "Image Digest: ${{ steps.docker_build.outputs.digest }}"
       
       - name: Log image details
         run: |
-          echo "Image: "joshdleexxx/testing:1234"
+          echo "Image: joshdleexxx/testing:1234"
           echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
 
       - name: Echo Upwind Configuration
