@@ -39,7 +39,6 @@ jobs:
         run: |
           echo "Upwind Client ID: ${{ secrets.UPWIND_CLIENT_ID }}"
           echo "Upwind Organization ID: ${{ secrets.UPWIND_ORGANIZATION_ID }}"
-          # Be cautious not to echo sensitive secrets like client_secret
 
       - name: Create Image Build Event in Upwind
         uses: upwindsecurity/create-image-build-event-action@v1
@@ -49,4 +48,4 @@ jobs:
           upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
           upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
           upwind_organization_id: ${{ secrets.UPWIND_ORGANIZATION_ID }}
-          dry_run: 'true'
+
