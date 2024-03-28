@@ -56,4 +56,3 @@ jobs:
           echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
           echo "Upwind Client ID: ${{ secrets.UPWIND_CLIENT_ID }}"
           echo "Upwind Organization ID: ${{ secrets.UPWIND_ORGANIZATION_ID }}"
-          echo "${ACCESS_TOKEN}"
