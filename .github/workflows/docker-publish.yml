@@ -1,4 +1,4 @@
-name: Docker
+name: Docker and Notify Upwind
 
 on:
   push:
@@ -7,11 +7,17 @@ on:
     branches: [ "main" ]
 
 env:
-  UPWIND_URL: https://agent.upwind.io/v1/org_123/delivery/argo-cd
+  UPWIND_AUTH_ENDPOINT: https://upwind-auth.example.com/oauth/token
+  UPWIND_API_ENDPOINT: https://agent.upwind.io/v1
+  UPWIND_ORGANIZATION_ID: org_o82q2EUg6mFM1apa
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  UPWIND_CLIENT_ID: ${{ secrets.UPWIND_CLIENT_ID }}
+  UPWIND_CLIENT_SECRET: ${{ secrets.UPWIND_CLIENT_SECRET }}
+  IMAGE_NAME: joshdleexxx/testing
 
 jobs:
-  push_to_registries:
-    name: Push Docker image to multiple registries
+  build_push_notify:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -19,61 +25,50 @@ jobs:
 
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      # Log in to Docker Hub
       - name: Log in to Docker Hub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_PASSWORD }}
 
-      # Log in to the GitHub Container Registry (GHCR)
-      - name: Log in to the Container registry (GHCR)
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      # Extract metadata (tags, labels) for Docker
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: |
-            joshdleexxx/testing
-            ghcr.io/${{ github.repository }}
-
-      # Build and push Docker images to both registries
-      - name: Build and push Docker images
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+      - name: Build and push Docker image to Docker Hub
+        uses: docker/build-push-action@v2
         with:
           context: .
+          file: Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ env.IMAGE_NAME }}
 
-      # Notify Upwind
-      - name: Notify Upwind
-        env:
-          UPWIND_TOKEN: ${{ secrets.UPWIND_TOKEN }}
+      - name: Authenticate with Upwind
+        id: upwind_auth
         run: |
-          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          curl -X POST \
-            ${{ env.UPWIND_URL }} \
-            -H 'Content-Type: application/json' \
-            -H "Authorization: Bearer ${UPWIND_TOKEN}" \
-            -d "{
-              \"resource_name\": \"my-app\",
-              \"resource_namespace\": \"default\",
-              \"resource_kind\": \"Application\",
-              \"deploy_started_at\": \"${CURRENT_TIME}\",
-              \"deploy_finished_at\": \"${CURRENT_TIME}\",
-              \"sync_data\": {
-                \"status\": \"created\",
-                \"revision\": \"${{ github.sha }}\",
-                \"path\": \"my-app\",
-                \"repo_url\": \"${{ github.server_url }}/${{ github.repository }}\"
-              }
-            }"
+          response=$(curl -s --location "${{ env.UPWIND_AUTH_ENDPOINT }}/oauth/token" \
+          --header "Content-Type: application/x-www-form-urlencoded" \
+          --data-urlencode "grant_type=client_credentials" \
+          --data-urlencode "audience=${{ env.UPWIND_API_ENDPOINT }}" \
+          --data-urlencode "client_id=${{ env.UPWIND_CLIENT_ID }}" \
+          --data-urlencode "client_secret=${{ env.UPWIND_CLIENT_SECRET }}")
+          echo "::set-output name=access_token::$(echo "$response" | jq -r '.access_token')"
+
+      - name: Notify Upwind
+        if: steps.upwind_auth.outputs.access_token
+        run: |
+          IMAGE_SHA=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.IMAGE_NAME }})
+          curl -fsSL "${{ env.UPWIND_API_ENDPOINT }}/v1/organizations/${{ env.UPWIND_ORGANIZATION_ID }}/events" \
+          --request POST \
+          --header "Content-Type: application/json" \
+          --header "Authorization: Bearer ${{ steps.upwind_auth.outputs.access_token }}" \
+          --data '{
+             "type": "image_build",
+             "reporter": "GitHub Actions",
+             "data": {
+               "image": "${{ env.IMAGE_NAME }}",
+               "commit_sha": "${{ github.sha }}",
+               "repository": "${{ github.repository }}",
+               "branch": "${GITHUB_REF_NAME}",
+               "image_sha": "'"$IMAGE_SHA"'",
+               "build_time": "$(date +'%Y-%m-%dT%H:%M:%SZ')"
+             }
+           }'
