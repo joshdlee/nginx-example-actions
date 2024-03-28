@@ -23,7 +23,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: joshdleexxx/testing:${{ github.run_id }}
+          tags: joshdleexxx/testing:main
 
       - name: Echo Docker Image Details
         run: |
@@ -51,7 +51,7 @@ jobs:
       
       - name: Echo Upwind Configuration
         run: |
-          echo "Image: joshdleexxx/testing:${{ github.run_id }}"
+          echo "Image: joshdleexxx/testing:main"
           echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
           echo "Upwind Client ID: ${{ secrets.UPWIND_CLIENT_ID }}"
           echo "Upwind Organization ID: ${{ secrets.UPWIND_ORGANIZATION_ID }}"
