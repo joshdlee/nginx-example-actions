@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/python:slim-bullseye
+FROM polyverse/vulnerable-nginx-1.4.0
 
 # Add a label to trigger CI/CD without affecting functionality
 LABEL version="1.0.1" \
