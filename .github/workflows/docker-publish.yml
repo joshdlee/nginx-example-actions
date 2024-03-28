@@ -29,6 +29,11 @@ jobs:
         run: |
           echo "Image Name: joshdleexxx/testing:${{ github.run_id }}"
           echo "Image Digest: ${{ steps.docker_build.outputs.digest }}"
+      
+      - name: Log image details
+        run: |
+          echo "Image: joshdleexxx/testing:${{ github.run_id }}"
+          echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
 
       - name: Echo Upwind Configuration
         run: |
