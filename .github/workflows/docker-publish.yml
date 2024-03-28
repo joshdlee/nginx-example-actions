@@ -23,16 +23,16 @@ jobs:
         with:
           context: .
           push: true
-          tags: "joshdleexxx/testing:1234"
+          tags: joshdleexxx/testing:${{ github.run_id }}
 
       - name: Echo Docker Image Details
         run: |
-          echo "Image Name: joshdleexxx/testing:1234"
+          echo "Image Name: joshdleexxx/testing:${{ github.run_id }}"
           echo "Image Digest: ${{ steps.docker_build.outputs.digest }}"
       
       - name: Log image details
         run: |
-          echo "Image: joshdleexxx/testing:1234"
+          echo "Image: joshdleexxx/testing:${{ github.run_id }}"
           echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
 
       - name: Echo Upwind Configuration
@@ -43,9 +43,17 @@ jobs:
       - name: Create Image Build Event in Upwind
         uses: upwindsecurity/create-image-build-event-action@v1
         with:
-          image: "joshdleexxx/testing:1234"
-          image_sha: "sha256:9593beddddd40c65ae1e3b09e96a87e60027c06385ed3db6a1eed5fb23a54261"
+          image: "joshdleexxx/testing:${{ github.run_id }}"
+          image_sha: "${{ steps.docker_build.outputs.digest }}"
           upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
           upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
           upwind_organization_id: ${{ secrets.UPWIND_ORGANIZATION_ID }}
-
+          dry_run: true
+      
+      - name: Echo Upwind Configuration
+        run: |
+          echo "Image: joshdleexxx/testing:${{ github.run_id }}"
+          echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
+          echo "Upwind Client ID: ${{ secrets.UPWIND_CLIENT_ID }}"
+          echo "Upwind Organization ID: ${{ secrets.UPWIND_ORGANIZATION_ID }}"
+          echo "${ACCESS_TOKEN}"
