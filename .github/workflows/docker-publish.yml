@@ -27,12 +27,12 @@ jobs:
 
       - name: Echo Docker Image Details
         run: |
-          echo "Image Name: joshdleexxx/joshua:${{ github.run_id }}"
+          echo "Image Name: joshdleexxx/joshua:main"
           echo "Image Digest: ${{ steps.docker_build.outputs.digest }}"
       
       - name: Log image details
         run: |
-          echo "Image: joshdleexxx/joshua:${{ github.run_id }}"
+          echo "Image: joshdleexxx/joshua:main"
           echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
 
       - name: Echo Upwind Configuration
@@ -43,7 +43,7 @@ jobs:
       - name: Create Image Build Event in Upwind
         uses: upwindsecurity/create-image-build-event-action@v2
         with:
-          image: "joshdleexxx/joshua:${{ github.run_id }}"
+          image: "joshdleexxx/joshua:main"
           image_sha: "${{ steps.docker_build.outputs.digest }}"
           upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
           upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
