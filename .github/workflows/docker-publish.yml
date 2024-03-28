@@ -24,7 +24,17 @@ jobs:
           context: .
           push: true
           tags: joshdleexxx/testing:${{ github.run_id }}
-          # This will output the digest of the image to be used in the next step.
+
+      - name: Echo Docker Image Details
+        run: |
+          echo "Image Name: joshdleexxx/testing:${{ github.run_id }}"
+          echo "Image Digest: ${{ steps.docker_build.outputs.digest }}"
+
+      - name: Echo Upwind Configuration
+        run: |
+          echo "Upwind Client ID: ${{ secrets.UPWIND_CLIENT_ID }}"
+          echo "Upwind Organization ID: ${{ secrets.UPWIND_ORGANIZATION_ID }}"
+          # Be cautious not to echo sensitive secrets like client_secret
 
       - name: Create Image Build Event in Upwind
         uses: upwindsecurity/create-image-build-event-action@v1
