@@ -8,7 +8,7 @@ on:
 
 env:
   UPWIND_AUTH_ENDPOINT: https://auth.upwind.io/oauth/token
-  UPWIND_API_ENDPOINT: https://agent.upwind.io/v1
+  UPWIND_API_ENDPOINT: https://api.upwind.io/v1
   UPWIND_ORGANIZATION_ID: org_o82q2EUg6mFM1apa
   DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
