@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  UPWIND_AUTH_ENDPOINT: https://upwind-auth.example.com/oauth/token
+  UPWIND_AUTH_ENDPOINT: https://auth.upwind.io/oauth/token
   UPWIND_API_ENDPOINT: https://agent.upwind.io/v1
   UPWIND_ORGANIZATION_ID: org_o82q2EUg6mFM1apa
   DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
