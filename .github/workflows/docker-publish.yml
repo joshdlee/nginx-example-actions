@@ -44,7 +44,7 @@ jobs:
         uses: upwindsecurity/create-image-build-event-action@v1
         with:
           image: "joshdleexxx/testing:1234"
-          image_sha: "${{ steps.docker_build.outputs.digest }}"
+          image_sha: "sha256:9593beddddd40c65ae1e3b09e96a87e60027c06385ed3db6a1eed5fb23a54261"
           upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
           upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
           upwind_organization_id: ${{ secrets.UPWIND_ORGANIZATION_ID }}
