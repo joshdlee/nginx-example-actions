@@ -54,8 +54,8 @@ jobs:
           echo "Docker Version:"
           docker version
           echo "=== Environment Variables ==="
-          echo "UPWIND_API_ENDPOINT: @https://api.upwind.io"
-          echo "UPWIND_AUTH_ENDPOINT: @https://api.upwind.io"
+          echo "UPWIND_API_ENDPOINT: https://api.upwind.io"
+          echo "UPWIND_AUTH_ENDPOINT: https://api.upwind.io"
           echo "Image: joshdleexxx/bullseye:main"
           echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
 
@@ -67,6 +67,6 @@ jobs:
           upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
           upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
           upwind_organization_id: ${{ secrets.UPWIND_ORGANIZATION_ID }}
-          upwind_api_endpoint: "@https://api.upwind.io"
-          upwind_auth_endpoint: "@https://api.upwind.io"
+          upwind_api_endpoint: "https://api.upwind.io"
+          upwind_auth_endpoint: "https://api.upwind.io"
           dry_run: false
