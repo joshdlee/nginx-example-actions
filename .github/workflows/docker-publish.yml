@@ -49,7 +49,7 @@ jobs:
           echo $UPWIND_ORGANIZATION_ID >> secrets.txt
 
       - name: Create Image Build Event in Upwind
-        uses: upwindsecurity/create-image-build-event-action@v2
+        uses: upwindsecurity/create-image-build-event-action@v3
         env:
           UPWIND_API_ENDPOINT: "@https://integration.upwind.io"
           UPWIND_AUTH_ENDPOINT: "@https://integration.upwind.io"
