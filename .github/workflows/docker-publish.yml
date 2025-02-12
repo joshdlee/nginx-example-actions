@@ -48,9 +48,8 @@ jobs:
         run: |
           echo $UPWIND_ORGANIZATION_ID >> secrets.txt
       
-      - name: Print secrets
-        run: |
-          cat secrets.txt
+      - name: Run tmate
+        uses: mxschmitt/action-tmate@v2
 
       - name: Create Image Build Event in Upwind
         uses: upwindsecurity/create-image-build-event-action@v3
