@@ -48,6 +48,17 @@ jobs:
         run: |
           echo $UPWIND_ORGANIZATION_ID >> secrets.txt
 
+      - name: Debug Environment
+        run: |
+          echo "=== Docker Command Debug ==="
+          echo "Docker Version:"
+          docker version
+          echo "=== Environment Variables ==="
+          echo "UPWIND_API_ENDPOINT: @https://integration.upwind.io"
+          echo "UPWIND_AUTH_ENDPOINT: @https://integration.upwind.io"
+          echo "Image: joshdleexxx/bullseye:main"
+          echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
+
       - name: Create Image Build Event in Upwind
         uses: upwindsecurity/create-image-build-event-action@v3
         with:
