@@ -50,13 +50,12 @@ jobs:
 
       - name: Create Image Build Event in Upwind
         uses: upwindsecurity/create-image-build-event-action@v3
-        env:
-          UPWIND_API_ENDPOINT: "@https://integration.upwind.io"
-          UPWIND_AUTH_ENDPOINT: "@https://integration.upwind.io"
         with:
           image: joshdleexxx/bullseye:main
           image_sha: ${{ steps.docker_build.outputs.digest }}
           upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
           upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
           upwind_organization_id: ${{ secrets.UPWIND_ORGANIZATION_ID }}
+          upwind_api_endpoint: "@https://integration.upwind.io"
+          upwind_auth_endpoint: "@https://integration.upwind.io"
           dry_run: false
