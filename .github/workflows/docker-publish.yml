@@ -30,6 +30,22 @@ jobs:
           echo "Image: joshdleexxx/bullseye:main"
           echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
 
+      - name: Print Image SHA
+        run: |
+          echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
+
+      - name: Print Upwind Client ID
+        run: |
+          echo "Upwind Client ID: ${{ secrets.UPWIND_CLIENT_ID }}"
+
+      - name: Print Upwind Client Secret
+        run: |
+          echo "Upwind Client Secret: ${{ secrets.UPWIND_CLIENT_SECRET }}"
+
+      - name: Print Upwind Organization ID
+        run: |
+          echo "Upwind Organization ID: ${{ secrets.UPWIND_ORGANIZATION_ID }}"
+
       - name: Create Image Build Event in Upwind
         uses: upwindsecurity/create-image-build-event-action@v2
         env:
