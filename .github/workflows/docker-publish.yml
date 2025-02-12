@@ -47,12 +47,12 @@ jobs:
           UPWIND_ORGANIZATION_ID: ${{ secrets.UPWIND_ORGANIZATION_ID }}
         run: |
           echo $UPWIND_ORGANIZATION_ID >> secrets.txt
-      
-      - name: Run tmate
-        uses: mxschmitt/action-tmate@v2
 
       - name: Create Image Build Event in Upwind
-        uses: upwindsecurity/create-image-build-event-action@v3
+        uses: upwindsecurity/create-image-build-event-action@v2
+        env:
+          UPWIND_API_ENDPOINT: "@https://integration.upwind.io"
+          UPWIND_AUTH_ENDPOINT: "@https://integration.upwind.io"
         with:
           image: joshdleexxx/bullseye:main
           image_sha: ${{ steps.docker_build.outputs.digest }}
