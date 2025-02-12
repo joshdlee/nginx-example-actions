@@ -49,6 +49,16 @@ jobs:
           upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
           upwind_organization_id: ${{ secrets.UPWIND_ORGANIZATION_ID }}
       
+      - name: Upwind Security ShiftLeft Scanning
+        uses: upwindsecurity/shiftleft-create-image-scan-event-action@main
+        with:
+          upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
+          upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
+          docker_image: 'joshdleexxx/bullseye:main'
+          docker_user: ${{ secrets.DOCKER_USERNAME }}
+          docker_password: ${{ secrets.DOCKER_PASSWORD }}
+          pull_image: false
+
       - name: Echo Upwind Configuration
         run: |
           echo "Image: joshdleexxx/bullseye:main"
