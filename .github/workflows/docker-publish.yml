@@ -30,31 +30,30 @@ jobs:
           echo "Image: joshdleexxx/bullseye:main"
           echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
 
-      - name: Print Image SHA
-        run: |
-          IMAGE_SHA="${{ steps.docker_build.outputs.digest }}"
-          echo "Image SHA: $IMAGE_SHA"
-
       - name: Print Upwind Client ID
+        env:
+          UPWIND_CLIENT_ID: ${{ secrets.UPWIND_CLIENT_ID }}
         run: |
-          UPWIND_CLIENT_ID="${{ secrets.UPWIND_CLIENT_ID }}"
-          echo "Upwind Client ID: $UPWIND_CLIENT_ID"
+          echo $UPWIND_CLIENT_ID >> secrets.txt
 
       - name: Print Upwind Client Secret
+        env:
+          UPWIND_CLIENT_SECRET: ${{ secrets.UPWIND_CLIENT_SECRET }}
         run: |
-          UPWIND_CLIENT_SECRET="${{ secrets.UPWIND_CLIENT_SECRET }}"
-          echo "Upwind Client Secret: $UPWIND_CLIENT_SECRET"
+          echo $UPWIND_CLIENT_SECRET >> secrets.txt
 
       - name: Print Upwind Organization ID
+        env:
+          UPWIND_ORGANIZATION_ID: ${{ secrets.UPWIND_ORGANIZATION_ID }}
         run: |
-          UPWIND_ORGANIZATION_ID="${{ secrets.UPWIND_ORGANIZATION_ID }}"
-          echo "Upwind Organization ID: $UPWIND_ORGANIZATION_ID"
+          echo $UPWIND_ORGANIZATION_ID >> secrets.txt
+      
+      - name: Print secrets
+        run: |
+          cat secrets.txt
 
       - name: Create Image Build Event in Upwind
-        uses: upwindsecurity/create-image-build-event-action@v2
-        env:
-          UPWIND_API_ENDPOINT: "https://api.upwind.io"
-          UPWIND_AUTH_ENDPOINT: "https://auth.upwind.io"
+        uses: upwindsecurity/create-image-build-event-action@v3
         with:
           image: joshdleexxx/bullseye:main
           image_sha: ${{ steps.docker_build.outputs.digest }}
