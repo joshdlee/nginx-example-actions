@@ -42,7 +42,7 @@ runs:
         curl -fsS -H "Authorization: Bearer $TOKEN" -L $UPWIND_AGENT_URL -o $AGENT_OUTPUT
         chmod +x $AGENT_OUTPUT
 
-        # Run scan and capture output
+        # Run scan and capture output, removing ANSI escape codes
         SCAN_OUTPUT=$(sudo $AGENT_OUTPUT image \
           --source=GITHUB_ACTIONS \
           --initiator=${GITHUB_TRIGGERING_ACTOR} \
@@ -56,9 +56,9 @@ runs:
           --docker-user="" \
           --docker-password="" \
           --debug=false \
-          --docker-pull=${{ inputs.pull_image }})
+          --docker-pull=${{ inputs.pull_image }} | sed 's/\x1b\[[0-9;]*m//g')
 
-        # Save output
+        # Clean up the output and save it
         echo "scan_result<<EOF" >> $GITHUB_OUTPUT
-        echo "$SCAN_OUTPUT" >> $GITHUB_OUTPUT
+        echo "$SCAN_OUTPUT" | sed 's/\x1b\[[0-9;]*m//g' | sed 's/[^[:print:]\t\n\r]//g' >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
