@@ -51,8 +51,9 @@ jobs:
 
       - name: Save Scan Output
         run: |
-          # Get the last 50 lines from the GitHub Actions log
-          tail -n 50 $GITHUB_WORKSPACE/../../_diag/Runner_*.log > scan_output.txt
+          echo "::group::Scan Results"
+          echo "${{ toJSON(steps.scan) }}" > scan_output.txt
+          echo "::endgroup::"
 
       - name: Create Scan Results Comment
         if: github.event_name == 'pull_request'
