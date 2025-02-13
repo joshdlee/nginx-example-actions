@@ -48,6 +48,7 @@ jobs:
           upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
           docker_image: "joshdleexxx/bullseye:main"
           pull_image: false
+        continue-on-error: true
 
       - name: Create Scan Results Comment
         if: github.event_name == 'pull_request'
@@ -55,12 +56,11 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const fs = require('fs');
-            const scanOutput = require('child_process').execSync('cat $GITHUB_STEP_SUMMARY').toString();
-            
             const output = `## 🔒 Upwind Security Scan Results
 
-            ${scanOutput}
+            \`\`\`
+            ${{ steps.scan.outputs.stdout }}
+            \`\`\`
             
             [View run details](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
             
