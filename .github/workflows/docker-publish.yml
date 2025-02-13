@@ -42,13 +42,12 @@ jobs:
 
       - name: Shift Left Image Scan
         id: scan
-        uses: upwindsecurity/shiftleft-create-image-scan-event-action@main
-        with:
-          upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
-          upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
-          docker_image: "joshdleexxx/bullseye:main"
-          pull_image: false
-        continue-on-error: true
+        run: |
+          upwindsecurity/shiftleft-create-image-scan-event-action@main \
+            --upwind_client_id=${{ secrets.UPWIND_CLIENT_ID }} \
+            --upwind_client_secret=${{ secrets.UPWIND_CLIENT_SECRET }} \
+            --docker_image="joshdleexxx/bullseye:main" \
+            --pull_image=false 2>&1 | tee scan_output.txt
 
       - name: Create Scan Results Comment
         if: github.event_name == 'pull_request'
@@ -56,10 +55,13 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const fs = require('fs');
+            const scanOutput = fs.readFileSync('scan_output.txt', 'utf8');
+            
             const output = `## 🔒 Upwind Security Scan Results
 
             \`\`\`
-            ${{ steps.scan.outputs.stdout }}
+            ${scanOutput}
             \`\`\`
             
             [View run details](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
