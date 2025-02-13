@@ -51,7 +51,11 @@ jobs:
 
       - name: Save Scan Output
         run: |
-          echo "$GITHUB_STEP_SUMMARY" > scan_output.txt
+          # Capture the output from running the scan command
+          docker run --rm upwindsecurity/shiftleft-create-image-scan-event-action@main \
+            --upwind_client_id=${{ secrets.UPWIND_CLIENT_ID }} \
+            --upwind_client_secret=${{ secrets.UPWIND_CLIENT_SECRET }} \
+            --docker_image="joshdleexxx/bullseye:main" 2>&1 | tee scan_output.txt
 
       - name: Create Scan Results Comment
         if: github.event_name == 'pull_request'
@@ -68,7 +72,7 @@ jobs:
             ${scanOutput}
             \`\`\`
             
-            [View run details](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
+            [View full details](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
