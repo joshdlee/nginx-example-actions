@@ -49,16 +49,23 @@ jobs:
           docker_image: "joshdleexxx/bullseye:main"
           pull_image: false
 
+      - name: Capture Scan Output
+        id: scan_output
+        run: |
+          echo "SCAN_RESULT<<EOF" >> $GITHUB_ENV
+          cat $GITHUB_STEP_SUMMARY >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
       - name: Create PR Comment
         uses: actions/github-script@v7
         env:
-          SCAN_OUTPUT: ${{ steps.scan.outputs.scan_result }}
+          SCAN_RESULT: ${{ env.SCAN_RESULT }}
         with:
           script: |
             const output = `## 🔒 Upwind Security Scan Results
 
             \`\`\`
-            ${process.env.SCAN_OUTPUT}
+            ${process.env.SCAN_RESULT}
             \`\`\`
             
             [View full details](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
