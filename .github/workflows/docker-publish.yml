@@ -49,10 +49,9 @@ jobs:
           docker_image: "joshdleexxx/bullseye:main"
           pull_image: false
 
-      - name: Capture Scan Output
+      - name: Save Scan Output
         run: |
-          echo "${{ steps.scan.outputs.* }}" > scan_output.txt
-          cat scan_output.txt
+          echo "$GITHUB_STEP_SUMMARY" > scan_output.txt
 
       - name: Create Scan Results Comment
         if: github.event_name == 'pull_request'
