@@ -50,41 +50,19 @@ jobs:
           pull_image: false
 
       - name: Create Scan Results Comment
-        uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const scanOutput = `${{ steps.scan.outputs.scan_result }}`;
+            const fs = require('fs');
+            const scanOutput = require('child_process').execSync('cat $GITHUB_STEP_SUMMARY').toString();
             
-            // Parse the scan output to get vulnerability counts
-            const criticalMatch = scanOutput.match(/(\d+)\s+Critical/);
-            const highMatch = scanOutput.match(/(\d+)\s+High/);
-            const mediumMatch = scanOutput.match(/(\d+)\s+Medium/);
-            const lowMatch = scanOutput.match(/(\d+)\s+Low/);
-            const unclassifiedMatch = scanOutput.match(/(\d+)\s+Unclassified/);
-            
-            const output = `
-            ## 🔒 Upwind Security Scan Results
-            
-            Found vulnerabilities in image joshdleexxx/bullseye:main:
-            
-            - 🔴 **${criticalMatch ? criticalMatch[1] : 0} Critical**
-            - 🟠 **${highMatch ? highMatch[1] : 0} High**
-            - 🟡 **${mediumMatch ? mediumMatch[1] : 0} Medium**
-            - 🔵 **${lowMatch ? lowMatch[1] : 0} Low**
-            - ⚪ **${unclassifiedMatch ? unclassifiedMatch[1] : 0} Unclassified**
-            
-            <details>
-            <summary>Full Scan Results</summary>
-            
-            \`\`\`
+            const output = `## 🔒 Upwind Security Scan Results
+
             ${scanOutput}
-            \`\`\`
-            </details>
             
-            [View run details](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})
-            `;
+            [View run details](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
