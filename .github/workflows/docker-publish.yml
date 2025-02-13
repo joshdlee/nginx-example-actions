@@ -57,6 +57,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create PR Comment
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         env:
           SCAN_RESULT: ${{ env.SCAN_RESULT }}
@@ -71,7 +72,7 @@ jobs:
             [View full details](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
             
             github.rest.issues.createComment({
-              issue_number: context.issue.number,
+              issue_number: context.payload.pull_request.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: output
