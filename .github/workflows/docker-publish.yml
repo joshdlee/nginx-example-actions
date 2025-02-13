@@ -30,14 +30,17 @@ jobs:
           echo "Image: joshdleexxx/bullseye:main"
           echo "Image SHA: ${{ steps.docker_build.outputs.digest }}"
 
-      - name: Create Image Build Event in Upwind
-        uses: upwindsecurity/create-image-build-event-action@v3
+      - name: Shift Left Image Scan
+        uses: upwindsecurity/shiftleft-create-image-scan-event-action@main
         with:
-          image: joshdleexxx/bullseye:main
-          image_sha: ${{ steps.docker_build.outputs.digest }}
           upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
           upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
-          upwind_organization_id: ${{ secrets.UPWIND_ORGANIZATION_ID }}
-          upwind_api_endpoint: "https://api.upwind.io"
-          upwind_auth_endpoint: "https://api.upwind.io"
-          dry_run: false
+          docker_image: "joshdleexxx/bullseye:main"
+          pull_image: false
+
+      - name: Shift Left Image Publish
+        uses: upwindsecurity/shiftleft-create-image-publish-event-action@main
+        with:
+          upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
+          upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
+          docker_image: "joshdleexxx/bullseye:main"
