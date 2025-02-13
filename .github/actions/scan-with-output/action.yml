@@ -23,20 +23,42 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Run Scan
-      id: scan
-      uses: upwindsecurity/shiftleft-create-image-scan-event-action@main
-      with:
-        upwind_client_id: ${{ inputs.upwind_client_id }}
-        upwind_client_secret: ${{ inputs.upwind_client_secret }}
-        docker_image: ${{ inputs.docker_image }}
-        pull_image: ${{ inputs.pull_image }}
-
-    - name: Capture Output
+    - name: Download and Run Scan
       id: capture_scan
       shell: bash
       run: |
-        SCAN_OUTPUT=$(cat $GITHUB_STEP_SUMMARY)
+        # Get auth token
+        TOKEN=$(curl -sSL -X POST \
+          --url https://oauth.upwind.io/oauth/token \
+          --data 'audience=https://agent.upwind.io' \
+          --data "client_id=${{ inputs.upwind_client_id }}" \
+          --data "client_secret=${{ inputs.upwind_client_secret }}" \
+          --data grant_type=client_credentials | jq -r '.access_token')
+
+        # Download sensor binary
+        UPWIND_AGENT=shiftleft
+        AGENT_OUTPUT=$GITHUB_WORKSPACE/$UPWIND_AGENT
+        UPWIND_AGENT_URL=https://releases.upwind.io/$UPWIND_AGENT/stable/$UPWIND_AGENT
+        curl -fsS -H "Authorization: Bearer $TOKEN" -L $UPWIND_AGENT_URL -o $AGENT_OUTPUT
+        chmod +x $AGENT_OUTPUT
+
+        # Run scan and capture output
+        SCAN_OUTPUT=$(sudo $AGENT_OUTPUT image \
+          --source=GITHUB_ACTIONS \
+          --initiator=${GITHUB_TRIGGERING_ACTOR} \
+          --upwind-uri=upwind.io \
+          --upwind-client-id=${{ inputs.upwind_client_id }} \
+          --upwind-client-secret=${{ inputs.upwind_client_secret }} \
+          --docker-image ${{ inputs.docker_image }} \
+          --commit-sha ${GITHUB_SHA} \
+          --branch ${GITHUB_REF} \
+          --repository ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY} \
+          --docker-user="" \
+          --docker-password="" \
+          --debug=false \
+          --docker-pull=${{ inputs.pull_image }})
+
+        # Save output
         echo "scan_result<<EOF" >> $GITHUB_OUTPUT
         echo "$SCAN_OUTPUT" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
