@@ -42,37 +42,23 @@ jobs:
 
       - name: Shift Left Image Scan
         id: scan
-        run: |
-          # Create a file to store the scan output
-          SCAN_OUTPUT_FILE="scan_output.txt"
-          
-          # Run the scan and capture its output
-          sudo /home/runner/work/nginx-example-actions/nginx-example-actions/shiftleft image \
-            --source=GITHUB_ACTIONS \
-            --initiator=${GITHUB_TRIGGERING_ACTOR} \
-            --upwind-uri=upwind.io \
-            --upwind-client-id=${{ secrets.UPWIND_CLIENT_ID }} \
-            --upwind-client-secret=${{ secrets.UPWIND_CLIENT_SECRET }} \
-            --docker-image "joshdleexxx/bullseye:main" \
-            --commit-sha ${GITHUB_SHA} \
-            --branch ${GITHUB_REF} \
-            --repository ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY} \
-            --docker-user="" \
-            --docker-password="" \
-            --debug=false \
-            --docker-pull=false | tee $SCAN_OUTPUT_FILE
+        uses: upwindsecurity/shiftleft-create-image-scan-event-action@main
+        with:
+          upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
+          upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
+          docker_image: "joshdleexxx/bullseye:main"
+          pull_image: false
 
       - name: Create PR Comment
         uses: actions/github-script@v7
+        env:
+          SCAN_OUTPUT: ${{ steps.scan.outputs.scan_result }}
         with:
           script: |
-            const fs = require('fs');
-            const scanOutput = fs.readFileSync('scan_output.txt', 'utf8');
-            
             const output = `## 🔒 Upwind Security Scan Results
 
             \`\`\`
-            ${scanOutput}
+            ${process.env.SCAN_OUTPUT}
             \`\`\`
             
             [View full details](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
@@ -90,3 +76,4 @@ jobs:
           upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
           upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
           docker_image: "joshdleexxx/bullseye:main"
+          pull_image: true
