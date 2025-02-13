@@ -2,7 +2,11 @@ name: Docker Build, Push, and Notify Upwind
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - '**'  # matches every branch
+  pull_request:
+    branches:
+      - '**'  # matches every branch
 
 jobs:
   build_and_notify:
