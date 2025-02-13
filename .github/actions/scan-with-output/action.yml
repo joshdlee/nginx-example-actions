@@ -1,0 +1,42 @@
+name: 'Scan With Output'
+description: 'Wrapper for Upwind Security scan that captures output'
+inputs:
+  upwind_client_id:
+    description: 'Upwind Client ID'
+    required: true
+  upwind_client_secret:
+    description: 'Upwind Client Secret'
+    required: true
+  docker_image:
+    description: 'Docker image to scan'
+    required: true
+  pull_image:
+    description: 'Whether to pull the image'
+    required: false
+    default: 'false'
+
+outputs:
+  scan_output:
+    description: 'Output from the scan'
+    value: ${{ steps.capture_scan.outputs.scan_result }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Scan
+      id: scan
+      uses: upwindsecurity/shiftleft-create-image-scan-event-action@main
+      with:
+        upwind_client_id: ${{ inputs.upwind_client_id }}
+        upwind_client_secret: ${{ inputs.upwind_client_secret }}
+        docker_image: ${{ inputs.docker_image }}
+        pull_image: ${{ inputs.pull_image }}
+
+    - name: Capture Output
+      id: capture_scan
+      shell: bash
+      run: |
+        SCAN_OUTPUT=$(cat $GITHUB_STEP_SUMMARY)
+        echo "scan_result<<EOF" >> $GITHUB_OUTPUT
+        echo "$SCAN_OUTPUT" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT

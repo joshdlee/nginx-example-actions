@@ -42,7 +42,7 @@ jobs:
 
       - name: Shift Left Image Scan
         id: scan
-        uses: upwindsecurity/shiftleft-create-image-scan-event-action@main
+        uses: ./.github/actions/scan-with-output
         with:
           upwind_client_id: ${{ secrets.UPWIND_CLIENT_ID }}
           upwind_client_secret: ${{ secrets.UPWIND_CLIENT_SECRET }}
@@ -57,7 +57,7 @@ jobs:
             const output = `## 🔒 Upwind Security Scan Results
 
             \`\`\`
-            ${{ toJSON(steps.scan) }}
+            ${{ steps.scan.outputs.scan_output }}
             \`\`\`
             
             [View full details](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
